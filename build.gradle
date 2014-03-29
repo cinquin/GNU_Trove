@@ -16,12 +16,14 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ///////////////////////////////////////////////////////////////////////////////
 
+
 apply plugin: 'base'
 
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'osgi'
+    apply plugin: 'maven-publish'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -31,6 +33,24 @@ subprojects {
     }
     dependencies {
         testCompile group: 'junit', name: 'junit', version: '4.+'
+    }
+
+
+
+
+    publishing {
+        repositories {
+            // BinTray
+            maven {
+//                id 'bintray-robeden-Trove-Trove'
+//                name 'robeden-Trove-Trove'
+                url "https://api.bintray.com/maven/robeden/Trove/Trove"
+                credentials {
+                    username = bintray_user
+                    password = bintray_key
+                }
+            }
+        }
     }
 
 
@@ -50,16 +70,24 @@ subprojects {
             instruction 'Bundle-ContactAddress:', 'http://trove.starlight-systems.com/contacts'
         }
     }
-}
 
 
-
-task assembleDistDir {
-    outputs.dir file( "${buildDir}/dist" )
-    subprojects.each { project ->
-        inputs.dir project.buildDir
+    def javaApiUrl = 'http://docs.oracle.com/javase/1.7.0/docs/api/'
+    tasks.withType(Javadoc) {
+        options.links(javaApiUrl)
     }
 
-    dependsOn( subprojects.jar )
-    dependsOn( subprojects.javadoc )
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from 'build/docs/javadoc'
+    }
+
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allSource
+        classifier = 'sources'
+    }
+}
+
+task wrapper(type: Wrapper, description: 'Gradle Wrapper task') {
+    gradleVersion = '1.11'
 }

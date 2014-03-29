@@ -8,6 +8,22 @@ dependencies {
 }
 
 
+publishing {
+    publications {
+        maven( MavenPublication ) {
+            groupId 'net.sf.trove4j'
+            artifactId 'trove4j'
+            version "${version}"
+
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+
 task( generateTemplates, type: JavaExec ) {
     main = 'gnu.trove.generator.Generator'
     classpath = configurations.runtime

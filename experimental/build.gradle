@@ -6,3 +6,19 @@ jar {
 dependencies {
     compile project( ':core' )
 }
+
+
+publishing {
+    publications {
+        maven( MavenPublication ) {
+            groupId 'net.sf.trove4j'
+            artifactId 'trove4j-experimental'
+            version "${version}"
+
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
