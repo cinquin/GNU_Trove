@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.*;
-
+import java.util.function.BiConsumer;
 
 /**
  * An implementation of the Map interface which uses an open addressed
@@ -325,6 +325,16 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
         return true;
     }
 
+    @Override
+    public void forEach(BiConsumer<? super K, ? super V> action) {
+        Object[] keys = _set;
+        V[] values = _values;
+        for (int i = keys.length; i-- > 0;) {
+            if (keys[i] != FREE && keys[i] != REMOVED) {
+                 action.accept((K) keys[i], (V) values[i]);
+            }
+        }
+    }
 
     /**
      * Retains only those entries in the map for which the procedure
