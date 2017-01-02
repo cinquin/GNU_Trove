@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.BiConsumer;
 
 /**
@@ -164,6 +165,15 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
         return doPut(value, index);
     }
 
+   public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+        int index = insertKey( key );
+        if ( index < 0 ) {
+             return _values[-index - 1];
+        }
+        V newValue = mappingFunction.apply(key);
+        doPut(newValue, index);
+        return newValue;
+   }
 
     private V doPut(V value, int index) {
         V previous = null;

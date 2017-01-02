@@ -36,6 +36,7 @@ import gnu.trove.T#E#Collection;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -248,11 +249,27 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         int index = insertKey( key );
         if ( index < 0 )
             return _values[-index - 1];
-	V newValue = supplier.get();
-        doPut(newValue, index);
-	return newValue;
+        V newValue = supplier.get();
+        return doPut(newValue, index);
     }
 
+    public V computeIfAbsent(#e# key, Function<Object, ? extends V> mappingFunction) {
+        int index = insertKey( key );
+        if ( index < 0 )
+            return _values[-index - 1];
+        V newValue = mappingFunction.apply(key);
+        doPut(newValue, index);
+        return newValue;
+    }
+
+    public V computeIfAbsent(#e# key, Supplier<V> supplier) {
+        int index = insertKey( key );
+        if ( index < 0 )
+            return _values[-index - 1];
+        V newValue = supplier.get();
+        doPut(newValue, index);
+        return newValue;
+    }
 
     @SuppressWarnings({"unchecked"})
     private V doPut( V value, int index ) {

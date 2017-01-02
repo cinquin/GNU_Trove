@@ -23,6 +23,7 @@ import gnu.trove.procedure.TObjectObjectProcedure;
 import gnu.trove.procedure.TObjectProcedure;
 
 import java.util.Map;
+import java.util.function.Function;
 
 
 /**
@@ -40,6 +41,8 @@ public interface TMap<K,V> extends Map<K,V> {
      *         or {@code null} if none was found.
      */
     public V putIfAbsent(K key, V value);
+
+    V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction);
 
 
     /**

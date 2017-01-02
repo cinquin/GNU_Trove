@@ -250,6 +250,26 @@ public class THashSet<E> extends TObjectHash<E>
     }
 
 
+    public E removeAndGet(Object obj) {
+        int index = index(obj);
+        if (index >= 0) {
+            E result = (E) _set[index];
+            removeAt(index);
+            return result;
+        }
+        return null;
+    }
+
+
+    public E get(Object obj) {
+       int index = index(obj);
+       if (index >= 0) {
+            return (E) _set[index];
+        } else {
+           return null;
+        }
+    }
+
     /**
      * Creates an iterator over the values of the set.  The iterator
      * supports element deletion.
