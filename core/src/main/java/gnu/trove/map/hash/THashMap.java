@@ -299,10 +299,31 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
      * @return false if the loop over the values terminated because
      *         the procedure returned false for some value.
      */
-    public boolean forEachValue(TObjectProcedure<? super V> procedure) {
+    public boolean forEachValueOld(TObjectProcedure<? super V> procedure) {
         V[] values = _values;
         Object[] set = _set;
         for (int i = values.length; i-- > 0;) {
+            if (set[i] != FREE
+                    && set[i] != REMOVED
+                    && !procedure.execute(values[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Executes <tt>procedure</tt> for each value in the map.
+     *
+     * @param procedure a <code>TObjectProcedure</code> value
+     * @return false if the loop over the values terminated because
+     *         the procedure returned false for some value.
+     */
+    public boolean forEachValue(TObjectProcedure<? super V> procedure) {
+        V[] values = _values;
+        Object[] set = _set;
+        for (int i = 0; i < values.length; i++) {
             if (set[i] != FREE
                     && set[i] != REMOVED
                     && !procedure.execute(values[i])) {
@@ -325,7 +346,7 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
     public boolean forEachEntry(TObjectObjectProcedure<? super K, ? super V> procedure) {
         Object[] keys = _set;
         V[] values = _values;
-        for (int i = keys.length; i-- > 0;) {
+        for (int i = 0; i < keys.length; i++) {
             if (keys[i] != FREE
                     && keys[i] != REMOVED
                     && !procedure.execute((K) keys[i], values[i])) {
@@ -339,7 +360,7 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
     public void forEach(BiConsumer<? super K, ? super V> action) {
         Object[] keys = _set;
         V[] values = _values;
-        for (int i = keys.length; i-- > 0;) {
+        for (int i = 0; i < keys.length; i++) {
             if (keys[i] != FREE && keys[i] != REMOVED) {
                  action.accept((K) keys[i], (V) values[i]);
             }
@@ -362,7 +383,7 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
         // Temporarily disable compaction. This is a fix for bug #1738760
         tempDisableAutoCompaction();
         try {
-            for (int i = keys.length; i-- > 0;) {
+            for (int i = 0; i < keys.length; i++) {
                 if (keys[i] != FREE
                         && keys[i] != REMOVED
                         && !procedure.execute((K) keys[i], values[i])) {
@@ -386,7 +407,7 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
     public void transformValues(TObjectFunction<V, V> function) {
         V[] values = _values;
         Object[] set = _set;
-        for (int i = values.length; i-- > 0;) {
+        for (int i = 0; i < values.length; i++) {
             if (set[i] != FREE && set[i] != REMOVED) {
                 values[i] = function.execute(values[i]);
             }
@@ -413,7 +434,7 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
         // Process entries from the old array, skipping free and removed slots. Put the
         // values into the appropriate place in the new array.
         int count = 0;
-        for (int i = oldCapacity; i-- > 0;) {
+        for (int i = 0; i < oldCapacity; i++) {
             Object o = oldKeys[i];
 
             if (o == FREE || o == REMOVED) continue;
@@ -532,14 +553,14 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
         // special case null values so that we don't have to
         // perform null checks before every call to equals()
         if (null == val) {
-            for (int i = vals.length; i-- > 0;) {
+            for (int i = 0; i < vals.length; i++) {
                 if ((set[i] != FREE && set[i] != REMOVED) &&
                         val == vals[i]) {
                     return true;
                 }
             }
         } else {
-            for (int i = vals.length; i-- > 0;) {
+            for (int i = 0; i < vals.length; i++) {
                 if ((set[i] != FREE && set[i] != REMOVED) &&
                         (val == vals[i] || equals(val, vals[i]))) {
                     return true;
@@ -600,7 +621,7 @@ public class THashMap<K, V> extends TObjectHash<K> implements TMap<K, V>, Extern
             Object[] values = _values;
             Object[] set = _set;
 
-            for (int i = values.length; i-- > 0;) {
+            for (int i = 0; i < values.length; i++) {
                 if ((set[i] != FREE && set[i] != REMOVED) &&
                         value == values[i] ||
                         (null != values[i] && THashMap.this.equals(values[i], value))) {

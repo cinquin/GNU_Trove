@@ -131,7 +131,7 @@ abstract public class TObjectHash<T> extends THash {
     @SuppressWarnings({"unchecked"})
     public boolean forEach(TObjectProcedure<? super T> procedure) {
         Object[] set = _set;
-        for (int i = set.length; i-- > 0;) {
+        for (int i = 0; i < set.length; i++) {
             if (set[i] != FREE
                     && set[i] != REMOVED
                     && !procedure.execute((T) set[i])) {

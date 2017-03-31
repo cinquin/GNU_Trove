@@ -160,7 +160,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         _values = (V[]) new Object[newCapacity];
         _states = new byte[newCapacity];
 
-        for ( int i = oldCapacity; i-- > 0; ) {
+        for ( int i = 0; i < oldCapacity; i++ ) {
             if( oldStates[i] == FULL ) {
                 #e# o = oldKeys[i];
                 int index = insertKey(o);
@@ -192,7 +192,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         // special case null values so that we don't have to
         // perform null checks before every call to equals()
         if ( null == val ) {
-            for ( int i = vals.length; i-- > 0; ) {
+            for ( int i = 0; i < vals.length; i++ ) {
                 if ( states[i] == FULL && null == vals[i] ) {
                     return true;
                 }
@@ -351,7 +351,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         #e#[] k = _set;
         byte[] states = _states;
 
-        for ( int i = k.length, j = 0; i-- > 0; ) {
+        for ( int i = 0, j = 0; i < k.length; i++ ) {
           if ( states[i] == FULL ) {
             keys[j++] = k[i];
           }
@@ -370,7 +370,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         #e#[] k = _set;
         byte[] states = _states;
 
-        for ( int i = k.length, j = 0; i-- > 0; ) {
+        for ( int i = 0, j = 0; i < k.length; i++ ) {
           if ( states[i] == FULL ) {
             dest[j++] = k[i];
           }
@@ -392,7 +392,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         V[] v = _values;
         byte[] states = _states;
 
-        for ( int i = v.length, j = 0; i-- > 0; ) {
+        for ( int i = 0, j = 0; i < v.length; i++ ) {
           if ( states[i] == FULL ) {
             vals[j++] = v[i];
           }
@@ -412,7 +412,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         V[] v = _values;
         byte[] states = _states;
 
-        for ( int i = v.length, j = 0; i-- > 0; ) {
+        for ( int i = 0, j = 0; i < v.length; i++ ) {
             if ( states[i] == FULL ) {
                 dest[j++] = ( V ) v[i];
             }
@@ -432,9 +432,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         return forEach( procedure );
     }
 
-
-    /** {@inheritDoc} */
-    public boolean forEachValue( TObjectProcedure<? super V> procedure ) {
+    public boolean forEachValueOld( TObjectProcedure<? super V> procedure ) {
         byte[] states = _states;
         V[] values = _values;
         for ( int i = values.length; i-- > 0; ) {
@@ -445,6 +443,17 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         return true;
     }
 
+    /** {@inheritDoc} */
+    public boolean forEachValue( TObjectProcedure<? super V> procedure ) {
+        byte[] states = _states;
+        V[] values = _values;
+        for ( int i = 0; i < values.length; i++) {
+            if ( states[i] == FULL && ! procedure.execute( values[i] ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /** {@inheritDoc} */
     @SuppressWarnings({"unchecked"})
@@ -452,7 +461,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         byte[] states = _states;
         #e#[] keys = _set;
         V[] values = _values;
-        for (int i = keys.length; i-- > 0;) {
+        for (int i = 0; i < keys.length; i++) {
             if (states[i] == FULL && ! procedure.execute(keys[i],values[i])) {
                 return false;
             }
@@ -472,7 +481,7 @@ public class T#E#ObjectHashMap<V> extends T#E#Hash implements
         // Temporarily disable compaction. This is a fix for bug #1738760
         tempDisableAutoCompaction();
         try {
-            for ( int i = keys.length; i-- > 0; ) {
+            for ( int i = 0; i < keys.length; i++ ) {
                 if ( states[i] == FULL && ! procedure.execute( keys[i], values[i] ) ) {
                     removeAt( i );
                     modified = true;
