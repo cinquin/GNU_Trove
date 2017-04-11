@@ -28,6 +28,7 @@ import java.io.ObjectOutput;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 
 /**
@@ -141,6 +142,15 @@ abstract public class TObjectHash<T> extends THash {
         return true;
     }
 
+    public void forEach(Consumer<? super T> consumer) {
+        Object[] set = _set;
+        for (int i = 0; i < set.length; i++) {
+            if (set[i] != FREE
+                    && set[i] != REMOVED) {
+                consumer.accept((T) set[i]);
+            }
+        }
+    }
 
     /**
      * Searches the set for <tt>obj</tt>
